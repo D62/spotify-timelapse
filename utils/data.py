@@ -20,12 +20,19 @@ def get_data(uploaded_file):
         df = df.reset_index(drop=True)
     return df
 
-
-def prepare_data(df, chart_type, max_length, start_date, end_date):
+def get_min_max_dates(df):
 
     # convert ISO-8601 format to date only
     df["date"] = pd.to_datetime(df["ts"]).dt.tz_convert(None)
     df["date"] = df["date"].dt.date
+
+    # get min and max dates available in file
+    min_date = min(df["date"])
+    max_date = max(df["date"])
+
+    return min_date, max_date
+
+def prepare_data(df, chart_type, max_length, start_date, end_date):
 
     # limit dataframe to selected dates
     df = df[(df["date"] >= start_date) & (df["date"] <= end_date)]

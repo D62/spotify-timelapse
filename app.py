@@ -36,47 +36,50 @@ if __name__ == "__main__":
         st.image("https://raw.githubusercontent.com/D62/spotify-timelapse/main/images/step1.png")
         st.write("""You are now ready to upload *my_spotify_data.zip* in the form below.""")
 
+    # set dummy min/max dates before file is uploaded
+    max_date = datetime.date.today()
+    min_date = max_date - datetime.timedelta(days=7)    
+
+    # upload file
+    disable_form = True
+    uploaded_file = st.file_uploader("Upload your *my_spotify_data.zip* file (see above for instructions to request it)", type="zip")
+    with st.spinner("Fetching data..."):
+        if uploaded_file is not None:
+            df = data.get_data(uploaded_file)
+            if df is None:
+                disable_form = True
+                st.session_state["df"] = None
+                st.error(f"Invalid file", icon="🚨")
+            else:
+                disable_form = False
+                min_date, max_date = data.get_min_max_dates(df)
+                st.session_state["df"] = df
+                st.success(f"Spotify data successfully uploaded", icon="✔️")
+
     # input form
     with st.form(key="Form"):
-        uploaded_file = st.file_uploader("Upload your *my_spotify_data.zip* file (see above for instructions to request it)", type="zip")
-        today = datetime.date.today()
-        last_week = today - datetime.timedelta(days=7)
         start_date, end_date = st.date_input(
             "Date range",
-            [last_week, today],
-            min_value=datetime.date(2008, 10, 7),
-            max_value=today,
+            [(max_date - datetime.timedelta(days=7)), max_date],
+            min_value=min_date,
+            max_value=max_date,
+            disabled=disable_form
         )
-        chart_type = st.selectbox("Chart type", ("Artists", "Albums", "Tracks"))
+        chart_type = st.selectbox("Chart type", ("Artists", "Albums", "Tracks"), disabled=disable_form)
+        title = st.text_input("Animation title", f"My Spotify streams", max_chars=60, disabled=disable_form)
 
         # launch functions after click on "Generate"
 
-        if st.form_submit_button(label="Generate"):
+        if st.form_submit_button(label="Generate", disabled=disable_form):
             print("--- 🏁 start generating animation ---")
-            progress_bar = st.progress(0)  # initialize progress bar
-
-            with st.spinner("Fetching data..."):
-                if uploaded_file is not None:
-                    df = data.get_data(uploaded_file)
-                    progress_bar.progress(1 / 3)
-
-            if df is None:
-                progress_bar.empty()
-                st.error(f"Invalid file", icon="🚨")
-                st.stop()
 
             with st.spinner("Preparing data frame..."):
                 table = data.prepare_data(
                     df, chart_type, max_length, start_date, end_date
                 )
-                progress_bar.progress(2 / 3)
 
             with st.spinner("Creating animation... (this may take a while)"):
-                title = f"Spotify streams by {chart_type.lower()}"
                 st.session_state["video"] = bcr.create_bcr(title, max_length, table)
-                progress_bar.progress(3 / 3)
-
-            progress_bar.empty()
 
     if len(st.session_state["video"]) != 0:
         print("--- ✔️ animation generated successfully ---")
