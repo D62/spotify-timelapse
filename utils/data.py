@@ -16,7 +16,8 @@ def get_data(uploaded_file):
                         errors="ignore",
                     )
                 df = pd.concat([df, json_normalized])
-    df = df.reset_index(drop=True)
+    if df is not None:
+        df = df.reset_index(drop=True)
     return df
 
 
