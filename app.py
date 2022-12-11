@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
     # file download explanation
 
-    with st.expander("Click here for instructions to request your data from Spotify and get the *my_spotify_data.zip* file"):
+    with st.expander("Click here for instructions to request your data from Spotify and get *my_spotify_data.zip*"):
         st.write("""In order to download your data from Spotify, you need to process as follow:""")
         st.write("""1) Open your Spotify privacy page: https://www.spotify.com/account/privacy/""")
         st.write("""2) Scroll down to the "Download your data" section""")
@@ -32,7 +32,7 @@ if __name__ == "__main__":
         st.write("""5) You will receive a link to confirm the request in your email, click on "Confirm" """)
         st.image("https://raw.githubusercontent.com/D62/spotify-timelapse/main/images/step1.png")
         st.write("""6) Wait until you receive your data (this can take up to 30 days)""")
-        st.write("""7) Once your data is ready to download, you will get an email with a link to download the *my_spotify_data.zip* file""")
+        st.write("""7) Once your data is ready to download, you will get an email with a link to download *my_spotify_data.zip*""")
         st.image("https://raw.githubusercontent.com/D62/spotify-timelapse/main/images/step1.png")
         st.write("""You are now ready to upload *my_spotify_data.zip* in the form below.""")
 
@@ -42,7 +42,7 @@ if __name__ == "__main__":
 
     # upload file
     disable_form = True
-    uploaded_file = st.file_uploader("Upload your *my_spotify_data.zip* file (see above for instructions to request it)", type="zip")
+    uploaded_file = st.file_uploader("Upload *my_spotify_data.zip* (see above for instructions to request it)", type="zip")
     with st.spinner("Fetching data..."):
         if uploaded_file is not None:
             df = data.get_data(uploaded_file)
